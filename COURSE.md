@@ -29,6 +29,7 @@
 - Test sites: saucedemo.com (login/products/cart), demoqa.com (forms, alerts, iframes, drag-and-drop), the-internet.herokuapp.com (uploads, hovers, dynamic content).
 - This is a SERIES of small Maven projects, one per phase, each in its own subfolder of the repo root (student's choice, so topics don't get mixed): `01-fundamentals` (Days 1–2), `02-pom` (Day 3), `03-testng` (Day 4), `04-advanced` (Day 5), Day 7 simulation in a fresh project. Create each project only when its phase starts. Java drills (Day 6) can be plain files.
 - Java is Homebrew-free: SDKMAN default is `21.0.7-amzn` (the Java 25 lines in `~/.zshrc` were commented out).
+- Java practice follows the same rule: one small Maven project per topic, created by the student (not one shared project). `java-practice` = interfaces (Shapes/Circle/Rectangle), finished and committed; do not modify it. Next: a new project for abstract classes. Java practice projects use the standard `src/main/java` layout (VS Code shows no errors for loose files or a `sourceDirectory` override). The student prefers writing real code from challenges over answering questions.
 
 **Reference material (look things up, do not re-read it all)**
 - `reference/pom.xml`, `reference/testng.xml`: known-good config.
@@ -48,7 +49,7 @@
 - [ ] Day 7 (Sun): Live-coding simulation, mock interview, finalize cheat sheet
 - [ ] Mon 19th: Review only
 
-**Current position:** Day 1 done through the first passing test in `s01_fundamentals` (pom with Selenium/TestNG/AssertJ, `@BeforeMethod`/`@AfterMethod`, title assertion). Notes: the WebDriver mental-model explanation was given but the student wants questions/quizzes deferred. Remaining Day 1: Java diagnostic (when the student asks for it).
+**Current position (end of Tue 2026-10-13):** Day 1 done (s01_fundamentals: first passing test with AssertJ assertion). Java diagnostic done. Tuesday was spent on Java OOP instead of Selenium (student had facial surgery that day, in pain and tired, so keep Wednesday's pace gentle): `java-practice/j01_interfaces` (interface + polymorphism, finished) and `j02_abstract_classes` (abstract class with shared field/constructor/method via `super(...)`, finished; Circle's `area()` is currently commented out in the student's experiment, so it doesn't compile until restored). The OOP block planned for Day 3's Java slot is mostly done. Known gaps still to revisit: String `==` vs `equals` (shaky), overloading vs. overriding, exceptions. The student's VS Code often doesn't show Java errors for new modules; `mvn compile` is the authority. We are about one day behind: Selenium locators (Day 2) start Wednesday, one small step at a time.
 
 **Daily template (4 hours):** Java 45 min → Selenium teach + hands-on ~2h15 → problem set 30 min → spoken interview Q&A 30 min. Day 1 is a shortened version of this.
 

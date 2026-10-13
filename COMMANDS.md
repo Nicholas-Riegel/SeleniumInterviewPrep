@@ -20,3 +20,11 @@ mkdir -p src/test/java/com/sel_int_prep
 
 # to run first test
 mvn test -Dtest=FirstTest
+
+# to run your java-practice files
+javac *.java
+java Shapes
+
+# to run main in maven
+mvn compile exec:java -Dexec.mainClass="Main"
+mvn compile exec:java -Dexec.mainClass="com.example.Main"
