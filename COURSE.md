@@ -10,16 +10,20 @@
 - **Time budget:** at least 4 hours/day.
 
 **Working style (follow strictly)**
-- Explain what you plan to do and get explicit approval before doing it.
+The student's explicit feedback (Wed 2026-10-14): the first course (`SeleniumSyllabus.md`, notes in `reference/old-course/`) went much better than the tiny-step, challenge-first style used on Days 1–2. Teach the way the first course did.
+
+- Explain what you plan to do and get explicit approval before doing it (once per section or module, not per step).
 - The student does all hands-on work (creating files, typing code, running commands). Give exact commands/content, but do not create or edit the student's source files or run their tests unless asked.
-- Explain every concept before any code. No unexplained copy-pasting. Every line gets explained.
+- **Teaching loop, one SECTION per message:** (1) explain the concept, (2) show the complete working code and explain every line, (3) give the exact command to run, (4) end with 3–5 "key points" for interviews. The student types and runs the example before any challenge. No unexplained copy-pasting. No single-step drip-feeding.
 - Teach one section at a time. Finish it before moving on.
-- Each module ends with a problem set written as challenges (no code given upfront). Show solutions only after the student attempts them.
+- **Problem sets come at the END of a module,** not in the middle of a lesson. Challenges name the methods, classes and imports to use and what each does, but give no finished code. If the student asks for the code or says they are lost, give the solution immediately, with no further hints and no "try again".
+- When an instruction could be read two ways (e.g. whether a step includes a click), state the goal first and mark the exact line to write. If an instruction turns out to be unclear, say so and fix it.
+- Do not ask for "it passed" reports. The student pastes only failures or surprises.
 - Every day ends with 5–8 spoken-style interview questions on that day's material. Student answers first, then Copilot corrects.
-- Every day starts with a 45-minute Java block (before Selenium, so it never gets skipped). Focus: plain-Java QA-level questions (collections, strings, OOP, exceptions, basic streams), not hard algorithms.
-- Start from `reference/` files and have Copilot explain them rather than typing everything from scratch. Teach gaps at the student's pace (see Pacing).
-- **Pacing (student's explicit request): ONE small step per message.** Never give multiple commands, concepts, or tasks in one reply. Explain what each command does and why BEFORE asking the student to run it. No bundled "check questions" or quizzes unless the student asks for them or it's the scheduled Q&A time; the student will say when to ask questions.
-- Be concise. Keep a running one-page cheat sheet in `CHEATSHEET.md` (student writes it, Copilot reviews).
+- **Java review is kept** (student likes it): each day includes a 45-minute plain-Java block (collections, strings, OOP, exceptions, basic streams, not hard algorithms). Run it as a worked lesson in the same style (concept, code, key points), then a short challenge. It may be moved to the end of the day if the student prefers to start with Selenium.
+- Start from `reference/` files and have Copilot explain them rather than typing everything from scratch.
+- **Notes:** the student maintains `Selenium_Notes.md`, `Java_Notes.md` and `CHEATSHEET.md` themselves. Do not write them. End each section with key points the student can copy. Review the cheat sheet when asked.
+- Be concise.
 
 **Environment**
 - macOS. Maven 3.9.10. Projects target **Java 21** (SDKMAN `21.0.7-amzn`), now the global default; verify with `mvn -v`. Allure was dropped from the course.
@@ -40,18 +44,28 @@
 
 ## Progress
 
-- [ ] Day 1 (Mon, short evening): Toolchain, WebDriver model, project setup, first test, Java diagnostic
-- [ ] Day 2 (Tue): Locators, interactions, waits
-- [ ] Day 3 (Wed): Page Object Model + BaseTest
-- [ ] Day 4 (Thu): TestNG + AssertJ + parallel/ThreadLocal
-- [ ] Day 5 (Fri): Actions, JS Executor, windows, screenshots, headless, CI walkthrough
+- [x] Day 1 (Mon, short evening): Toolchain, WebDriver model, project setup, first test, Java diagnostic
+- [x] Day 2 (Wed): Locators, interactions, waits (problem set dropped by student's choice; Q&A folded into Thursday evening)
+- [ ] Day 3 + Day 4 combined (Thu): Page Object Model + BaseTest, then TestNG + AssertJ + parallel/ThreadLocal
+- [ ] Day 5 (Fri): Actions, JS Executor, windows, screenshots, headless, CI walkthrough + the deferred Java review blocks
 - [ ] Day 6 (Sat): Java coding drill, QA fundamentals, Grid/BDD concepts, framework-design talk
 - [ ] Day 7 (Sun): Live-coding simulation, mock interview, finalize cheat sheet
-- [ ] Mon 19th: Review only
+- [ ] Mon 19th: Review only (plus anything still unfinished)
 
-**Current position (end of Tue 2026-10-13):** Day 1 done (s01_fundamentals: first passing test with AssertJ assertion). Java diagnostic done. Tuesday was spent on Java OOP instead of Selenium (student had facial surgery that day, in pain and tired, so keep Wednesday's pace gentle): `java-practice/j01_interfaces` (interface + polymorphism, finished) and `j02_abstract_classes` (abstract class with shared field/constructor/method via `super(...)`, finished; Circle's `area()` is currently commented out in the student's experiment, so it doesn't compile until restored). The OOP block planned for Day 3's Java slot is mostly done. Known gaps still to revisit: String `==` vs `equals` (shaky), overloading vs. overriding, exceptions. The student's VS Code often doesn't show Java errors for new modules; `mvn compile` is the authority. We are about one day behind: Selenium locators (Day 2) start Wednesday, one small step at a time.
+**Plan for Thursday 2026-10-15 (student's decision, both modules are required to get back on track):** do Day 3 (POM) and Day 4 (TestNG + AssertJ + parallel/ThreadLocal) in one day. No locator problem set. Teach tight as a **review-and-rebuild**, since the student already built all of this in the first course, in `/Users/nicholas/Dev/Selenium/SeleniumSelfStudy` (sibling folder, read-only reference for us; do not modify it):
+- `selenium-pom/`: `BasePage` (protected `driver` and `wait`, `click`/`type`/`getText` with built-in waits; the comment block explains why driver lifecycle does NOT belong in BasePage), `LoginPage` (private `final By` locators, `loginAs(...)` returns `ProductsPage`, `getErrorMessage()`), `ProductsPage` (`isLoaded()`), `MultiThreadLoginTest` (`ThreadLocal<WebDriver>`, `@BeforeMethod(alwaysRun = true)`/`@AfterMethod` with `remove()`, groups `smoke`/`regression`, parallel `@DataProvider`, AssertJ), `testng.xml` (`parallel="methods" thread-count="3"`).
+- `selenium-ci/src/test/java/com/seleniumstudy/base/BaseTest.java`: `BaseTest` with the `HEADLESS` env-var switch.
+- Not covered there, so teach these as NEW: `CartPage` and the add-to-cart flow, a proper reusable `BaseTest` that holds the `ThreadLocal<WebDriver>`, AssertJ soft assertions (`SoftAssertions`), `@Test` attributes (`priority`, `dependsOnMethods`, `enabled`), lifecycle order (`@BeforeSuite` … `@AfterSuite`) and `@BeforeClass` vs. `@BeforeMethod`, PageFactory vs. plain POM (conceptual), and the tradeoff "why ThreadLocal".
 
-**Daily template (4 hours):** Java 45 min → Selenium teach + hands-on ~2h15 → problem set 30 min → spoken interview Q&A 30 min. Day 1 is a shortened version of this.
+Order: (1) go straight to rebuilding, with NO read-and-explain step (student's decision): new project `s02_pom` in this repo, student re-types/adapts `BasePage`, `LoginPage`, `ProductsPage` quickly, using the first-course files above as the source to copy from; (2) add `CartPage` and a `BaseTest` with `ThreadLocal` and a headless switch; (3) tests: login, add to cart, cart badge/contents, with soft assertions; (4) groups, `testng.xml`, parallel run, `-Dgroups=` runs; (5) lifecycle order demo and `@Test` attributes. No Java block, no end-of-module problem sets (the tests are the exercise). End the day with the spoken Q&A, mixing a few Day 2 questions (locator strategy, CSS vs. XPath, StaleElementReference, implicit vs. explicit waits) plus POM and TestNG questions. If time runs short, the first thing to move to Friday is step (5).
+
+**Deferred Java review (student wants to keep it):** Day 2's block (collections List/Set/Map, String methods, `==` vs `equals`), Day 3's block (overloading vs. overriding, exceptions) and Day 4's block (String/array problems, `equals`/`hashCode`, immutability) move to Friday (45 min at the start) and the Saturday drill. Do them as worked lessons in the usual style.
+
+**Update (Wed 2026-10-14, evening):** Day 2 hands-on work is done in `s01_fundamentals`: `LocatorsTest` (id, name, class, tag, linkText, findElements, CSS incl. attribute/partial/combinators, XPath incl. text and parent/sibling, relative locators), `InteractionsTest` (login, clear, checkboxes, `Select`, alerts, nested iframes, file upload, with a wait added to the upload test), and `WaitsTest` (explicit wait, timeout with `TimeoutException`, `FluentWait`). Locator priority was discussed. The student is still recovering from surgery, so keep sections short and clear. Run `mvn test` once in `s01_fundamentals` at the start of Thursday to confirm everything is green (the-internet is sometimes slow).
+
+**Previous position (end of Tue 2026-10-13):** Day 1 done (s01_fundamentals: first passing test with AssertJ assertion). Java diagnostic done. Tuesday was spent on Java OOP instead of Selenium (student had facial surgery that day, in pain and tired, so keep Wednesday's pace gentle): `java-practice/j01_interfaces` (interface + polymorphism, finished) and `j02_abstract_classes` (abstract class with shared field/constructor/method via `super(...)`, finished; Circle's `area()` is currently commented out in the student's experiment, so it doesn't compile until restored). The OOP block planned for Day 3's Java slot is mostly done. Known gaps still to revisit: String `==` vs `equals` (shaky), overloading vs. overriding, exceptions. The student's VS Code often doesn't show Java errors for new modules; `mvn compile` is the authority. We are about one day behind: Selenium locators (Day 2) start Wednesday, one small step at a time.
+
+**Daily template (4 hours):** Java 45 min (worked lesson + short challenge) → Selenium sections (concept, full code, run, key points) ~2h15 → end-of-module problem set 30 min → spoken interview Q&A 30 min. Day 1 was a shortened version of this.
 
 **Dropped on purpose (mention conceptually only):** Excel/Apache POI, Allure/ExtentReports, building CI from scratch, hard algorithms (merge sorted lists etc., optional).
 
@@ -66,24 +80,24 @@
 - [ ] Interview Q&A: how does Selenium work end to end
 
 ## Day 2 — Locators, Interactions and Waits
-- [ ] Java (45 min): collections (List/Set/Map), String methods
-- [ ] Locators: id, name, class, tag, link text; CSS selectors (priority); XPath (when needed); Selenium 4 relative locators; DevTools verification; fragile vs. reliable locators
-- [ ] click, sendKeys, clear, getText, getAttribute, isDisplayed/isEnabled/isSelected
-- [ ] `Select` dropdowns, alerts, iframes, file upload
-- [ ] Why tests flake; implicit vs. explicit vs. fluent waits (never mix implicit and explicit); `WebDriverWait` + `ExpectedConditions`; the conditions used daily
-- [ ] Problem set: locator challenges (saucedemo, the-internet) + waits against dynamic-loading pages
-- [ ] Interview Q&A: locator strategy, CSS vs. XPath, StaleElementReferenceException, ElementNotInteractable, implicit vs. explicit
+- [ ] Java (45 min): collections (List/Set/Map), String methods. **Deferred to Friday.**
+- [x] Locators: id, name, class, tag, link text; CSS selectors (priority); XPath (when needed); Selenium 4 relative locators; DevTools verification; fragile vs. reliable locators
+- [x] click, sendKeys, clear, getText, getAttribute, isDisplayed/isEnabled/isSelected
+- [x] `Select` dropdowns, alerts, iframes, file upload
+- [x] Why tests flake; implicit vs. explicit vs. fluent waits (never mix implicit and explicit); `WebDriverWait` + `ExpectedConditions`; the conditions used daily
+- [ ] ~~Problem set: locator challenges + waits~~ (dropped by student's choice)
+- [ ] Interview Q&A: locator strategy, CSS vs. XPath, StaleElementReferenceException, ElementNotInteractable, implicit vs. explicit. **Moved to the end of Thursday.**
 
-## Day 3 — Page Object Model
-- [ ] Java (45 min): OOP (inheritance, interfaces, abstract vs. interface, overloading vs. overriding), exceptions (checked vs. unchecked, try/catch/finally)
+## Day 3 — Page Object Model (Thursday, combined with Day 4)
+- [ ] Java (45 min): OOP (inheritance, interfaces, abstract vs. interface, overloading vs. overriding), exceptions (checked vs. unchecked, try/catch/finally). **Skipped Thursday; OOP mostly done Tuesday, rest deferred to Friday.**
 - [ ] Why POM exists; `BasePage` with shared helpers (wait + click, type, getText)
 - [ ] Page classes: private locators, expressive methods, return page objects
 - [ ] `BaseTest` for driver lifecycle (`@BeforeMethod`/`@AfterMethod`, headless switch)
 - [ ] Build: LoginPage, ProductsPage, CartPage on saucedemo + tests
 - [ ] Interview Q&A: explain POM, PageFactory vs. plain POM, how to structure a framework
 
-## Day 4 — TestNG and AssertJ
-- [ ] Java (45 min): String and array problems (reverse, palindrome, anagram, duplicates, frequency count with HashMap); `equals`/`hashCode`, String immutability
+## Day 4 — TestNG and AssertJ (Thursday, after Day 3's POM)
+- [ ] Java (45 min): String and array problems (reverse, palindrome, anagram, duplicates, frequency count with HashMap); `equals`/`hashCode`, String immutability. **Deferred to Friday/Saturday.**
 - [ ] Annotations and lifecycle order (`@BeforeSuite` … `@AfterSuite`), `@Test` attributes (priority, groups, dependsOnMethods, enabled)
 - [ ] `@DataProvider` (inline), `testng.xml` suites, groups, parallel execution + `ThreadLocal<WebDriver>`
 - [ ] TestNG assertions vs. AssertJ; hard vs. soft assertions

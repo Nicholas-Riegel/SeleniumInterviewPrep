@@ -18,9 +18,6 @@ mvn compile
 # add test folder
 mkdir -p src/test/java/com/sel_int_prep
 
-# to run first test
-mvn test -Dtest=FirstTest
-
 # to run your java-practice files
 javac *.java
 java Shapes
@@ -28,3 +25,8 @@ java Shapes
 # to run main in maven
 mvn compile exec:java -Dexec.mainClass="Main"
 mvn compile exec:java -Dexec.mainClass="com.example.Main"
+
+# to run first test in maven
+mvn test -Dtest=FirstTest
+mvn test -Dtest=LocatorsTest
+mvn test -Dtest=InteractionsTest#uploadsWork
