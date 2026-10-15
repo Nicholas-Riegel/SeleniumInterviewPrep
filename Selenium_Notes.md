@@ -1,38 +1,137 @@
-Here is the whole interactions block as **one challenge**. Put everything in `InteractionsTest.java`, which has the same `setUp()` and `tearDown()` as before. Make `setUp()` open `https://www.saucedemo.com`, and have the tests that need another site call `driver.get(...)` themselves.
+# Selenium Interview Prep: Core Concepts & APIs
 
-**New API you need (everything else you already know):**
+## Element Inspection & State
 
-- `getAttribute("value")` reads what's typed in a field. `getText()` reads visible text, and it's empty for inputs.
+| Method | Returns | Use When |
+|--------|---------|----------|
+| `getText()` | String | Reading visible text on the page |
+| `getAttribute("value")` | String | Reading what's typed in an input field (getText() returns empty for inputs) |
+| `isDisplayed()` | boolean | Checking if an element is visible |
+| `isEnabled()` | boolean | Checking if a button/input is clickable |
+| `isSelected()` | boolean | Checking if a checkbox, radio, or option is selected |
 
-- `isDisplayed()`, `isEnabled()` and `isSelected()` return a boolean. `isSelected` is for checkboxes, radios and options.
+---
 
-- **`Select`** wraps a `<select>` dropdown: `new Select(element)`, then `selectByVisibleText("Option 1")`, `selectByValue(...)`, `selectByIndex(...)` and `getFirstSelectedOption()`. It's in `org.openqa.selenium.support.ui.Select`. It only works on real `<select>` elements. Custom dropdowns built from divs need normal clicks.
+## Dropdowns (Select Elements)
 
-- **Alerts:** `Alert alert = driver.switchTo().alert();` gives you `getText()`, `accept()` (OK), `dismiss()` (Cancel) and `sendKeys("...")` (prompts). Selenium can't see an alert as a page element, so you have to switch to it.
+Use `Select` class from `org.openqa.selenium.support.ui.Select` for **real `<select>` HTML elements only**. Custom dropdowns built from divs need normal clicks.
 
-- **Iframes:** an iframe is a separate document inside the page, and elements inside it are invisible to `findElement` until you switch with `driver.switchTo().frame("name-or-id")`. Use `switchTo().parentFrame()` to go up one level and `switchTo().defaultContent()` to return to the main page. Forgetting to switch is one of the main causes of `NoSuchElementException` on a page that looks right.
+```java
+WebElement selectElement = driver.findElement(By.id("dropdown"));
+Select dropdown = new Select(selectElement);
 
-- **File upload:** there's no dialog to handle. Call `sendKeys(absolutePath)` on the `<input type="file">`. Get the path with `new File("pom.xml").getAbsolutePath()` (`java.io.File`).
+dropdown.selectByVisibleText("Option 1");
+dropdown.selectByValue("value123");
+dropdown.selectByIndex(2);
 
-It passes now, so the flakiness is real. The run took **37 seconds**, which is very slow for a single upload test, and that points to a slow server that sometimes didn't answer in time. I can't prove that was the cause of the earlier failure, but the symptom fits: "element not there yet" followed by "there on retry". The URL line told us nothing, because the upload form posts back to `/upload`.
+WebElement selectedOption = dropdown.getFirstSelectedOption();
+String selectedText = selectedOption.getText();
+```
 
-That pattern is **flakiness**, and it leads straight into waits.
+---
 
-**Waits: the explanation**
+## Alerts
 
-Selenium sends commands immediately. `findElement` checks the page **once** and fails if the element isn't there. Pages load, run JavaScript and fetch data over time, so a test that is faster than the page is a flaky test.
+Alerts are separate from the DOM—you can't find them with `findElement()`. Switch to them first:
 
-**The three kinds of wait:**
-- **Implicit:** `driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10))`. It is set once, and every `findElement` then retries for up to 10s before throwing. It only covers "element exists in the DOM", it applies globally, and it hides slowness. **Never mix it with explicit waits.** The two timeouts can combine unpredictably, so tests wait much longer than expected.
-- **Explicit:** `new WebDriverWait(driver, Duration.ofSeconds(10))`, then `.until(condition)`. It waits for one specific condition on one specific element, and it returns as soon as the condition is true. This is the default you should use.
-- **Fluent:** an explicit wait you configure further: `new FluentWait<>(driver).withTimeout(...).pollingEvery(...).ignoring(NoSuchElementException.class)`. You use it when you need a custom polling interval or exceptions to ignore. `WebDriverWait` is a `FluentWait` with sensible defaults (500ms polling).
+```java
+Alert alert = driver.switchTo().alert();
 
-**`ExpectedConditions`** (`org.openqa.selenium.support.ui.ExpectedConditions`) are the conditions you pass to `until(...)`:
-- `visibilityOfElementLocated(By)`: in the DOM **and** visible. It returns the `WebElement`.
-- `presenceOfElementLocated(By)`: in the DOM, visible or not.
-- `elementToBeClickable(By)`: visible and enabled. Use it before clicking.
-- `invisibilityOfElementLocated(By)`: for loading spinners.
-- `textToBePresentInElementLocated(By, String)`, `urlContains(String)`, `alertIsPresent()`, `stalenessOf(WebElement)`.
+String message = alert.getText();
+alert.accept();      // Click OK
+alert.dismiss();     // Click Cancel
+alert.sendKeys("text");  // For prompts
+```
 
-If the time runs out, `until` throws `TimeoutException`. It can be an interview talking point that this is a different exception from `NoSuchElementException`.
+---
+
+## Iframes
+
+Iframes are separate documents inside the page. Elements inside are **invisible to `findElement()` until you switch**:
+
+```java
+// Switch into an iframe
+driver.switchTo().frame("iframe-name-or-id");
+driver.switchTo().frame(0);  // Also works with index
+
+// Now find elements inside the iframe
+WebElement element = driver.findElement(By.id("inside-iframe"));
+
+// Switch back out
+driver.switchTo().parentFrame();  // Up one level
+driver.switchTo().defaultContent();  // To the main page
+```
+
+**Common mistake:** Forgetting to switch causes `NoSuchElementException` even when you can see the element in the browser.
+
+---
+
+## File Upload
+
+No dialog to handle—use `sendKeys()` directly on `<input type="file">`:
+
+```java
+WebElement fileInput = driver.findElement(By.id("file-upload"));
+String absolutePath = new File("path/to/file.txt").getAbsolutePath();
+fileInput.sendKeys(absolutePath);
+```
+
+---
+
+## Waits: The Foundation of Reliable Tests
+
+### Why Waits Matter
+
+Selenium sends commands immediately. `findElement()` checks the page **once** and fails if the element isn't there. Since pages load, run JavaScript, and fetch data asynchronously, a test that is faster than the page is a **flaky test**.
+
+### The Three Kinds of Wait
+
+| Kind | Setup | Use Case | Gotcha |
+|------|-------|----------|--------|
+| **Implicit** | `driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10))` | Set once; applies globally to all `findElement()` calls | ⚠️ Never mix with explicit waits—they combine unpredictably and cause very long timeouts |
+| **Explicit** | `new WebDriverWait(driver, Duration.ofSeconds(10)).until(condition)` | Wait for one specific condition on one specific element; returns as soon as true | Default; use this in most tests (polls every 500ms) |
+| **Fluent** | `new FluentWait<>(driver).withTimeout(...).pollingEvery(...).ignoring(...)` | Custom polling interval or exceptions to ignore | Advanced; `WebDriverWait` is a `FluentWait` with sensible defaults |
+
+**Best practice:** Use explicit waits in your page object helper methods (like `BasePage.click()`, `BasePage.type()`). Never use implicit waits.
+
+### ExpectedConditions
+
+Common conditions to pass to `.until()`:
+
+```java
+wait.until(ExpectedConditions.visibilityOfElementLocated(By locator));
+// ↑ Element is in DOM and visible; returns the WebElement
+
+wait.until(ExpectedConditions.presenceOfElementLocated(By locator));
+// ↑ Element is in DOM (may not be visible)
+
+wait.until(ExpectedConditions.elementToBeClickable(By locator));
+// ↑ Element is visible and enabled; use before clicking
+
+wait.until(ExpectedConditions.invisibilityOfElementLocated(By locator));
+// ↑ For waiting on spinners/loaders to disappear
+
+wait.until(ExpectedConditions.textToBePresentInElementLocated(By locator, String text));
+wait.until(ExpectedConditions.urlContains(String substring));
+wait.until(ExpectedConditions.alertIsPresent());
+wait.until(ExpectedConditions.stalenessOf(WebElement element));
+```
+
+If the timeout expires, `.until()` throws `TimeoutException` (different from `NoSuchElementException`—interview talking point).
+
+### Practical Example (in BasePage)
+
+```java
+protected void click(By locator){
+    wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
+}
+
+protected void type(By locator, String input){
+    WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+    element.clear();
+    element.sendKeys(input);
+}
+```
+
+This way, every interaction waits before acting—tests are reliable by default.
 
