@@ -46,10 +46,10 @@ The student's explicit feedback (Wed 2026-10-14): the first course (`SeleniumSyl
 
 - [x] Day 1 (Mon, short evening): Toolchain, WebDriver model, project setup, first test, Java diagnostic
 - [x] Day 2 (Wed): Locators, interactions, waits (problem set dropped by student's choice; Q&A folded into Thursday evening)
-- [ ] Day 3 + Day 4 combined (Thu): Page Object Model + BaseTest, then TestNG + AssertJ + parallel/ThreadLocal
-- [ ] Day 5 (Fri): Actions, JS Executor, windows, screenshots, headless, CI walkthrough + the deferred Java review blocks
-- [ ] Day 6 (Sat): Java coding drill, QA fundamentals, Grid/BDD concepts, framework-design talk
-- [ ] Day 7 (Sun): Live-coding simulation, mock interview, finalize cheat sheet
+- [x] Day 3 + Day 4 combined (Thu, carried into Fri 10-16): all hands-on work done (`s03_pom` = POM snapshot, `s04_testng` = TestNG work incl. lifecycle demo). Only the Q&A is open (moved to Sat/Sun)
+- [x] Day 5 (Fri): all hands-on work done (Actions, JS Executor, windows, screenshots, headless, CI walkthrough). Still open: the Day 5 Q&A and the deferred Java review blocks (Sat/Sun)
+- [ ] Day 6 (Sat 10-17): drills: 1) locators, 2) find and add Maven dependencies yourself, then set up and run multithreaded POM tests, 3) Java skills review, 4) Grid and BDD concepts (short, spoken)
+- [ ] Day 7 (Sun 10-18): drills: 1) more Java review, 2) Actions, JS Executor, windows/tabs, 3) QA fundamentals chat, 4) live-coding simulation. Mock interview and cheat sheet are unscheduled (see Day 7)
 - [ ] Mon 19th: Review only (plus anything still unfinished)
 
 **Plan for Thursday 2026-10-15 (student's decision, both modules are required to get back on track):** do Day 3 (POM) and Day 4 (TestNG + AssertJ + parallel/ThreadLocal) in one day. No locator problem set. Teach tight as a **review-and-rebuild**, since the student already built all of this in the first course, in `/Users/nicholas/Dev/Selenium/SeleniumSelfStudy` (sibling folder, read-only reference for us; do not modify it):
@@ -58,6 +58,20 @@ The student's explicit feedback (Wed 2026-10-14): the first course (`SeleniumSyl
 - Not covered there, so teach these as NEW: `CartPage` and the add-to-cart flow, a proper reusable `BaseTest` that holds the `ThreadLocal<WebDriver>`, AssertJ soft assertions (`SoftAssertions`), `@Test` attributes (`priority`, `dependsOnMethods`, `enabled`), lifecycle order (`@BeforeSuite` … `@AfterSuite`) and `@BeforeClass` vs. `@BeforeMethod`, PageFactory vs. plain POM (conceptual), and the tradeoff "why ThreadLocal".
 
 Order: (1) go straight to rebuilding, with NO read-and-explain step (student's decision): new project `s02_pom` in this repo, student re-types/adapts `BasePage`, `LoginPage`, `ProductsPage` quickly, using the first-course files above as the source to copy from; (2) add `CartPage` and a `BaseTest` with `ThreadLocal` and a headless switch; (3) tests: login, add to cart, cart badge/contents, with soft assertions; (4) groups, `testng.xml`, parallel run, `-Dgroups=` runs; (5) lifecycle order demo and `@Test` attributes. No Java block, no end-of-module problem sets (the tests are the exercise). End the day with the spoken Q&A, mixing a few Day 2 questions (locator strategy, CSS vs. XPath, StaleElementReference, implicit vs. explicit waits) plus POM and TestNG questions. If time runs short, the first thing to move to Friday is step (5).
+
+**Update (Fri 2026-10-16, morning):** The student rebuilt everything in **`s03_pom`** (not `s02_pom`; `s02_pom` is an abandoned first attempt, ignore it). Student preference confirmed: do NOT hand over finished code for rebuild tasks; give the concept plus a spec of what the class needs, and give code only if asked or stuck. Ask one question at a time.
+- Done and passing (5 tests, headless + incognito): `BasePage`, `LoginPage`, `ProductsPage` (`isLoaded`, `addItemToCart(String)` is `void` and scoped to the matching card with an early `return`, `goToCart()` returns `CartPage`), `CartPage` (`itemIsInCart`, locator `.cart_item`), `LoginPageTest` (2 tests), `ProductsPageTest` (`@DataProvider` with `Object[][]`, `parallel = true`).
+- `ThreadLocal<WebDriver>` already exists, but it is **copy-pasted into both test classes** as an instance field, with `ChromeOptions` (`--incognito`, `--headless=new` hardcoded). `tearDown()` calls `quit()` but **not `driver.remove()`**.
+- `testng.xml` exists (`parallel="methods" thread-count="3"`, both classes) but is **not wired into the POM**: there is no Surefire `suiteXmlFiles`, so `mvn test` ignores it. No test has `groups` yet, so the `-Dgroups=smoke` comments in it do not work yet.
+- Not started: `BaseTest` (extract the duplicated setup, `HEADLESS` env switch, `remove()`), `SoftAssertions`, cart badge check, groups, wiring `testng.xml`, lifecycle order demo, `@Test` attributes (`priority`, `dependsOnMethods`, `enabled`), the spoken Q&A. Student also dislikes the SLF4J and CDP-version console warnings (harmless; the CDP one comes from Chrome 155 being newer than Selenium 4.20.0). Possible cleanup: `slf4j-nop` test dependency matching the `slf4j-api` version, and/or lowering the `org.openqa.selenium` logger level in `BaseTest`.
+- `BaseTest` is done (Fri 10:00): `ThreadLocal` plus `getDriver()`, `remove()`, `HEADLESS` env switch, `alwaysRun = true`; both test classes extend it. Student is making `BasePage`/`BaseTest` abstract.
+- Plan for Friday (student's decision, 10:07): soft assertions + groups + wired `testng.xml` (60 min), lifecycle/`@Test` attributes (30 min), then all of Day 5 (Actions, JS Executor, windows, screenshots, headless, CI walkthrough). **The spoken Q&A (Days 2–5) and the deferred Java review blocks are moved to Saturday and Sunday** (Saturday's mixed Q&A round must cover Day 2–5 questions; Java blocks join the Saturday drill).
+
+**Update (Fri 2026-10-16, 11:25):** `s04_testng` is green: `mvn test` = 5 tests, `-Dgroups=smoke` = 4, `-Dgroups=regression` = 4, suite name "Saucedemo Suite" (so `testng.xml` is wired). Soft assertions, groups and `getCartBadgeCount()` done. **Next (afternoon):** lifecycle order demo + `@Test` attributes (`priority`, `dependsOnMethods`, `enabled`), then Day 5: `Actions`, `JavascriptExecutor`, windows/tabs, screenshots on failure, headless/CI walkthrough (`reference/workflows/selenium.yml`). Q&A and Java blocks stay on Sat/Sun.
+
+**Update (Fri 2026-10-16, 16:55):** Day 5 is in `s05_advanced` (copy of `s04_testng`, no `testng.xml`, `BaseTest` no longer opens a page, each test calls `get(...)` on the-internet): `ActionsTest`, `JSExecuterTest`, `WindowsTest` all passing. **Student rule (reconfirmed 16:07/16:20):** for NEW material, show the code in chat with a line-by-line explanation and let the student paste it in and run it. Do NOT create or edit the student's test files unless asked. **One test/step per message.** Remaining today: screenshots on failure, then the headless/CI walkthrough (read `reference/workflows/selenium.yml`, can slip to Saturday morning). Q&A and Java blocks stay on Sat/Sun.
+
+**Update (Fri 2026-10-16, 18:35):** Days 1–5 hands-on work is complete. Student's plan for the weekend: **Saturday** = drill locators, drill setting up/running multithreaded POM tests, Java skills review. **Sunday** = more Java review, drill `Actions`/`JavascriptExecutor`/windows. The original Day 6/7 items (QA fundamentals, Grid/BDD concepts, live-coding simulation, mock interview, cheat sheet) are no longer scheduled; they are listed under Day 7 as "not scheduled" so nothing is silently lost. Mention this to the student if time looks short on Sunday.
 
 **Deferred Java review (student wants to keep it):** Day 2's block (collections List/Set/Map, String methods, `==` vs `equals`), Day 3's block (overloading vs. overriding, exceptions) and Day 4's block (String/array problems, `equals`/`hashCode`, immutability) move to Friday (45 min at the start) and the Saturday drill. Do them as worked lessons in the usual style.
 
@@ -90,42 +104,48 @@ Order: (1) go straight to rebuilding, with NO read-and-explain step (student's d
 
 ## Day 3 — Page Object Model (Thursday, combined with Day 4)
 - [ ] Java (45 min): OOP (inheritance, interfaces, abstract vs. interface, overloading vs. overriding), exceptions (checked vs. unchecked, try/catch/finally). **Skipped Thursday; OOP mostly done Tuesday, rest deferred to Friday.**
-- [ ] Why POM exists; `BasePage` with shared helpers (wait + click, type, getText)
-- [ ] Page classes: private locators, expressive methods, return page objects
-- [ ] `BaseTest` for driver lifecycle (`@BeforeMethod`/`@AfterMethod`, headless switch)
-- [ ] Build: LoginPage, ProductsPage, CartPage on saucedemo + tests
+- [x] Why POM exists; `BasePage` with shared helpers (wait + click, type, getText)
+- [x] Page classes: private locators, expressive methods, return page objects
+- [x] `BaseTest` for driver lifecycle (`@BeforeMethod`/`@AfterMethod`, headless switch, `ThreadLocal`, `remove()`, `alwaysRun`); abstract
+- [x] Build: LoginPage, ProductsPage, CartPage on saucedemo + tests (login, add to cart, cart badge via `getCartBadgeCount()` in `ProductsPage`); done in `s04_testng`, with `s03_pom` kept as the clean POM snapshot
 - [ ] Interview Q&A: explain POM, PageFactory vs. plain POM, how to structure a framework
 
 ## Day 4 — TestNG and AssertJ (Thursday, after Day 3's POM)
 - [ ] Java (45 min): String and array problems (reverse, palindrome, anagram, duplicates, frequency count with HashMap); `equals`/`hashCode`, String immutability. **Deferred to Friday/Saturday.**
-- [ ] Annotations and lifecycle order (`@BeforeSuite` … `@AfterSuite`), `@Test` attributes (priority, groups, dependsOnMethods, enabled)
-- [ ] `@DataProvider` (inline), `testng.xml` suites, groups, parallel execution + `ThreadLocal<WebDriver>`
-- [ ] TestNG assertions vs. AssertJ; hard vs. soft assertions
-- [ ] Problem set: suite with groups and a parallel run
+- [x] Annotations and lifecycle order (`@BeforeSuite` … `@AfterSuite`), `@Test` attributes (priority, groups, dependsOnMethods, enabled); done with `LifecycleDemoTest` in `s04_testng` (run with `mvn test -Dtest=LifecycleDemoTest`, since it is not in `testng.xml`)
+- [x] `@DataProvider` (inline, `Object[][]`)
+- [x] `testng.xml` suite wired through Surefire 3.2.5 `suiteXmlFiles` in `s04_testng` (suite "Saucedemo Suite" confirmed in `testng-results.xml`), groups `smoke`/`regression` added (`mvn test` = 5, `-Dgroups=smoke` = 4, `-Dgroups=regression` = 4), parallel execution (`parallel = true` data provider + suite-level `parallel="methods"`, both with `ThreadLocal<WebDriver>`)
+- [x] TestNG assertions vs. AssertJ; hard vs. soft assertions (`SoftAssertions` as a local variable in `itemIsAddedToCart`; a shared field would race under parallel; `assertSoftly` or a `ThreadLocal` are the alternatives)
+- [x] Problem set: suite with groups and a parallel run (done via `s04_testng`)
 - [ ] Interview Q&A: why ThreadLocal, `@BeforeClass` vs. `@BeforeMethod`, soft asserts
 
 ## Day 5 — Advanced Interactions, Headless and CI
 - [ ] Java (45 min): streams and lambdas, Optional, generics basics
-- [ ] `Actions`: hover, right-click, drag-and-drop, key combos
-- [ ] `JavascriptExecutor`: scrollIntoView, JS click, reading DOM values; the casting pattern
-- [ ] Multiple windows/tabs, screenshots on failure (`ITestListener` or `@AfterMethod` with `ITestResult`)
-- [ ] Headless Chrome, Surefire with `testng.xml`, `mvn test` flags and system properties
-- [ ] CI walkthrough: read and explain `reference/workflows/selenium.yml` (not built from scratch)
+- [x] `Actions`: hover, right-click, key presses and key combos done in `s05_advanced` (`ActionsTest`); drag-and-drop covered as concept only (HTML5 drag events are unreliable with `Actions`, JS fallback)
+- [x] `JavascriptExecutor`: reading `document.title`, scrollIntoView, JS click, the `(JavascriptExecutor)` cast and `Long` return type; done in `JSExecuterTest`
+- [x] Multiple windows/tabs (`WindowsTest`: original handle, wait for 2 windows, loop `getWindowHandles()`, `switchTo().window`, `close()` vs `quit()`)
+- [x] Screenshots on failure: manual version in `@AfterMethod` with `ITestResult` first, then the `ITestListener` version (`TestListener.onTestFailure`, registered with `@Listeners` on `BaseTest`, saves to `target/screenshots/`); both seen working in `s05_advanced`
+- [x] Headless Chrome (`HEADLESS=true mvn test` via `System.getenv` in `BaseTest`), Surefire with `testng.xml` (done in `s04_testng`), `mvn test` flags (`-Dtest=`, `-Dgroups=`)
+- [x] CI walkthrough: read `reference/workflows/selenium.yml` (GitHub Actions: trigger on push/PR, fresh Ubuntu VM, checkout, Java 21, `HEADLESS=true mvn test`, upload artifacts with `if: always()`). Student's summary: "instructions to set up a virtual machine and run the tests in the cloud". CI is understood only at a basic level; revisit briefly in Saturday's Q&A (why headless in CI, "passes locally, fails in CI").
 - [ ] Interview Q&A: when to use JS click, how to handle new windows, how do you run tests in CI
 
-## Day 6 — Java Drill, QA Fundamentals and Concepts
-- [ ] Java coding drill (timed, ~60 min): FizzBuzz, two-sum, balanced brackets, first non-repeating char, word count with streams; Java 21 basics (records, `var`)
-- [ ] QA fundamentals (~20 min): test case design, writing a good bug report, test pyramid, what to automate vs. keep manual, smoke vs. regression, REST/status codes and API testing basics (Postman vs. RestAssured)
-- [ ] Concepts, ~15 min each: Selenium Grid / `RemoteWebDriver`, Shadow DOM, what Cucumber/BDD is, test data management, Laravel Dusk background and how it transfers
-- [ ] Framework-design talk: structure, reporting, flaky-test handling
-- [ ] Scenario questions: "passes locally, fails in CI", "how do you debug a flaky test", "how would you start automating this app"
-- [ ] Interview Q&A: mixed spoken round
+## Day 6 — Saturday 2026-10-17: Drills (student's plan, set Fri 18:35)
+Format: drill and practice, not new teaching. For each topic the student builds from memory; Copilot gives concept + spec and hints, not finished code (see the student's rules above).
+- [ ] 1. Locators drill: id, name, class, tag, linkText, CSS (attribute, partial, combinators), XPath (text, parent/sibling), relative locators; CSS vs. XPath and locator priority. Practice target: saucedemo (the-internet is OK when fast)
+- [ ] 2a. Maven dependencies: find and add them yourself (the student has let Copilot supply `pom.xml` until now and fears being asked in the interview). Cover: what `pom.xml` is, the `groupId`/`artifactId`/`version` coordinates, searching https://central.sonatype.com or https://mvnrepository.com for `selenium-java`, `testng` and `assertj-core`, copying the `<dependency>` block, `<scope>test</scope>` and why, the `<properties>` Java version, the Surefire plugin and `suiteXmlFiles`, running `mvn compile`/`mvn test`, and reading a dependency error (artifact not found, wrong version, missing scope). Drill: student builds a new `pom.xml` for an empty project without help. Reference: `s04_testng/pom.xml`
+- [ ] 2. Set up and run multithreaded POM tests from scratch: `BasePage`, page classes, abstract `BaseTest` with `ThreadLocal<WebDriver>` (`remove()`, `alwaysRun`, `HEADLESS`), `@DataProvider(parallel = true)`, `testng.xml` with `parallel="methods"` wired through Surefire (`suiteXmlFiles`), groups and `-Dgroups=`. Reference solutions: `s03_pom` (POM snapshot) and `s04_testng` (TestNG)
+- [ ] 3. Java skills review: collections (List/Set/Map), String methods and immutability, `==` vs `equals`, `equals`/`hashCode`, overloading vs. overriding, exceptions (checked vs. unchecked, try/catch/finally); worked lessons plus short challenges (the deferred Java blocks from Days 2–4)
+- [ ] 4. Concepts, short (about 5 min each, spoken, no building): Selenium Grid / `RemoteWebDriver` (hub, nodes, `RemoteWebDriver` pointed at the hub URL, cloud grids like BrowserStack/Sauce Labs, how it scales parallel runs) and BDD / Cucumber (Gherkin Given/When/Then, step definitions, when it helps; be honest if not used). Check the job description first: if it names Cucumber or Grid, give them more time
+- [ ] Spoken Q&A on today's topics (locators, ThreadLocal, `@BeforeClass` vs. `@BeforeMethod`, soft asserts, why headless in CI), as time allows
 
-## Day 7 — Live-Coding Simulation and Mock Interview
-- [ ] Live-coding simulation (60–90 min): automate login → add to cart → checkout on saucedemo with POM, TestNG, assertions, narrating choices aloud
-- [ ] Mock interview: mixed Selenium + Java + QA questions, Copilot plays interviewer
-- [ ] Finalize `CHEATSHEET.md`
-- [ ] Flag weak spots for Monday review
+## Day 7 — Sunday 2026-10-18: Drills (student's plan, set Fri 18:35)
+- [ ] 1. More Java review: streams and lambdas, Optional, generics basics, String/array problems (reverse, palindrome, anagram, duplicates, frequency count with HashMap), `equals`/`hashCode` again if still shaky
+- [ ] 2. Drill `Actions` (hover, right-click, key presses/combos), `JavascriptExecutor` (read, scroll, JS click, casting), windows/tabs (handles, switch, `close()` vs. `quit()`); build from memory in a fresh project, reference: `s05_advanced`
+- [ ] 3. QA fundamentals chat (about 20 min, spoken): test case design, writing a good bug report, test pyramid, what to automate vs. keep manual, smoke vs. regression, REST/status codes and API testing basics (Postman vs. RestAssured)
+- [ ] 4. Live-coding simulation (60-90 min, afternoon): automate login -> add to cart -> checkout on saucedemo with POM, TestNG and assertions, narrating choices aloud. Student builds it from scratch, including the `pom.xml`; Copilot plays interviewer and only gives hints when asked
+- [ ] Spoken Q&A for those topics (when to use JS click, how to handle new windows, screenshots on failure, how tests run in CI), as time allows
+
+**Not scheduled after the student's plan (decide Sunday evening or fold into Monday review):** concepts (Shadow DOM, test data management, Laravel Dusk transfer; Grid and BDD moved to Saturday), framework-design talk and scenario questions ("passes locally, fails in CI", "debug a flaky test"), the mock interview, finalizing `CHEATSHEET.md`, flagging weak spots.
 
 ---
 

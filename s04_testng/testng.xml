@@ -11,7 +11,7 @@
     <!-- Now try:
 
     mvn test — all 5 tests
-    mvn test -Dgroups=smoke — 1 test only
+    mvn test -Dgroups=smoke — 4 tests only
     mvn test -Dgroups=regression — 4 tests only -->
 
 </suite>
