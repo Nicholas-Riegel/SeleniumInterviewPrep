@@ -41,11 +41,8 @@ public class ProductsPage extends BasePage {
                 item.findElement(By.cssSelector(".btn_inventory")).click();
     
                 return;
-    
             }
-    
         }
-    
     }
 
     public int getCartBadgeCount(){

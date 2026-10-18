@@ -156,6 +156,30 @@ public class ProductsPage extends BasePage {
 
 ---
 
+## Adding Maven Dependencies
+
+**Versions used in this course:** Selenium `4.20.0`, TestNG `7.10.2`, AssertJ `3.25.3`, Surefire `3.2.5`. Use these unless the course changes them.
+
+**Finding a dependency:**
+1. Search for the artifact on [mvnrepository.com](https://mvnrepository.com) or [central.sonatype.com](https://central.sonatype.com). For Selenium, search `selenium-java`.
+2. Check the publisher and group ID. Selenium's group ID starts with `org.seleniumhq`.
+3. Pick the version above, open its **Maven** tab, and copy the `<dependency>` block.
+4. Paste it into `pom.xml` inside `<dependencies>`. If that element doesn't exist, add it below `<properties>`.
+5. Run `mvn compile`. `BUILD SUCCESS` means Maven downloaded the jar and the dependency works.
+
+**Choosing `<scope>`:**
+- `<scope>test</scope>`: the library is only needed by test code under `src/test/java`, and it isn't packaged into the build. Use it for TestNG and AssertJ.
+- No scope (default `compile`): the library is needed by main code too. Selenium is in this group, because page objects may use it.
+
+**Reading a dependency error:**
+- `Could not find artifact ...`: the group ID, artifact ID, or version is wrong. Check the spelling against the search result.
+- Version errors or conflicts: confirm the version number matches the course version.
+- `mvn compile` passes but the IDE shows errors: this is usually the editor, not the code. Run `Java: Clean Java Language Server Workspace` or `Maven: Reload Projects`.
+
+**Reference:** `s04_testng/pom.xml` has the working versions and scopes.
+
+---
+
 ## Running Tests
 - `mvn test` — Run all tests
 - `mvn -Dtest=LoginTest test` — Run only `LoginTest.java`

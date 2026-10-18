@@ -14,6 +14,7 @@ The three paths after it are the three folders to create.
 
 # to compile
 mvn compile
+mvn test-compile
 
 # add test folder
 mkdir -p src/test/java/com/sel_int_prep
@@ -25,6 +26,11 @@ java Shapes
 # to run main in maven
 mvn compile exec:java -Dexec.mainClass="Main"
 mvn compile exec:java -Dexec.mainClass="com.example.Main"
+
+or 
+
+mvn compile 
+java -cp target/classes com.sel_int_prep.CollectionBasics
 
 # to run first test in maven
 mvn test -Dtest=FirstTest

@@ -21,9 +21,7 @@ public class ProductsPageTest extends BaseTest {
             {"Sauce Labs Bike Light"},
     
             {"Sauce Labs Bolt T-Shirt"}
-    
         };
-    
     }
     
     @Test(dataProvider = "itemsToCart", groups = {"smoke", "regression"})    
@@ -44,7 +42,5 @@ public class ProductsPageTest extends BaseTest {
         soft.assertThat(cartPage.itemIsInCart(itemForCart)).isTrue();
 
         soft.assertAll();
-
     }
-
 }

@@ -52,6 +52,9 @@ The student's explicit feedback (Wed 2026-10-14): the first course (`SeleniumSyl
 - [ ] Day 7 (Sun 10-18): drills: 1) more Java review, 2) Actions, JS Executor, windows/tabs, 3) QA fundamentals chat, 4) live-coding simulation. Mock interview and cheat sheet are unscheduled (see Day 7)
 - [ ] Mon 19th: Review only (plus anything still unfinished)
 
+**Weak spots (add to as they come up):**
+- XPath: needs a lot more practice (axes like `following-sibling`, `//` + tag name, `text()` vs `@attribute`, and checking expressions in DevTools with `$x(...)` before using them in tests)
+
 **Plan for Thursday 2026-10-15 (student's decision, both modules are required to get back on track):** do Day 3 (POM) and Day 4 (TestNG + AssertJ + parallel/ThreadLocal) in one day. No locator problem set. Teach tight as a **review-and-rebuild**, since the student already built all of this in the first course, in `/Users/nicholas/Dev/Selenium/SeleniumSelfStudy` (sibling folder, read-only reference for us; do not modify it):
 - `selenium-pom/`: `BasePage` (protected `driver` and `wait`, `click`/`type`/`getText` with built-in waits; the comment block explains why driver lifecycle does NOT belong in BasePage), `LoginPage` (private `final By` locators, `loginAs(...)` returns `ProductsPage`, `getErrorMessage()`), `ProductsPage` (`isLoaded()`), `MultiThreadLoginTest` (`ThreadLocal<WebDriver>`, `@BeforeMethod(alwaysRun = true)`/`@AfterMethod` with `remove()`, groups `smoke`/`regression`, parallel `@DataProvider`, AssertJ), `testng.xml` (`parallel="methods" thread-count="3"`).
 - `selenium-ci/src/test/java/com/seleniumstudy/base/BaseTest.java`: `BaseTest` with the `HEADLESS` env-var switch.
@@ -139,7 +142,7 @@ Format: drill and practice, not new teaching. For each topic the student builds 
 - [ ] Spoken Q&A on today's topics (locators, ThreadLocal, `@BeforeClass` vs. `@BeforeMethod`, soft asserts, why headless in CI), as time allows
 
 ## Day 7 — Sunday 2026-10-18: Drills (student's plan, set Fri 18:35)
-- [ ] 1. More Java review: streams and lambdas, Optional, generics basics, String/array problems (reverse, palindrome, anagram, duplicates, frequency count with HashMap), `equals`/`hashCode` again if still shaky
+- [ ] 1. More Java review: streams and lambdas, Optional, generics basics, `static` classes and methods (static vs. instance members, static utility classes, static nested classes, why a `static` driver breaks parallel tests and how that ties to `ThreadLocal`), String/array problems (reverse, palindrome, anagram, duplicates, frequency count with HashMap), `equals`/`hashCode` again if still shaky
 - [ ] 2. Drill `Actions` (hover, right-click, key presses/combos), `JavascriptExecutor` (read, scroll, JS click, casting), windows/tabs (handles, switch, `close()` vs. `quit()`); build from memory in a fresh project, reference: `s05_advanced`
 - [ ] 3. QA fundamentals chat (about 20 min, spoken): test case design, writing a good bug report, test pyramid, what to automate vs. keep manual, smoke vs. regression, REST/status codes and API testing basics (Postman vs. RestAssured)
 - [ ] 4. Live-coding simulation (60-90 min, afternoon): automate login -> add to cart -> checkout on saucedemo with POM, TestNG and assertions, narrating choices aloud. Student builds it from scratch, including the `pom.xml`; Copilot plays interviewer and only gives hints when asked
@@ -160,5 +163,5 @@ Format: drill and practice, not new teaching. For each topic the student builds 
 - [ ] How I handle iframes, alerts, windows
 - [ ] How tests run in CI, headless, and how I report
 - [ ] How I'd handle flaky tests
-- [ ] Core Java: `equals`/`hashCode`, String immutability, checked vs. unchecked, overloading vs. overriding
+- [ ] Core Java: `equals`/`hashCode`, String immutability, checked vs. unchecked, overloading vs. overriding, `static` vs. instance (and why a static driver is unsafe for parallel tests)
 - [ ] QA basics: good bug report, test pyramid, what to automate
